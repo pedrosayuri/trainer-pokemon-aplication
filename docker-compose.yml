@@ -12,7 +12,7 @@ services:
     environment:
       - DB_HOST=database
     volumes:
-      - ./pokemon-trainer-api:/app
+      - backend-data:/app
 
   frontend:
     build:
@@ -29,3 +29,9 @@ services:
       - POSTGRESQL_USERNAME=docker
       - POSTGRESQL_PASSWORD=docker
       - POSTGRESQL_DATABASE=apipokemontrainer
+    volumes:
+      - database-data:/bitnami/postgresql
+
+volumes:
+  backend-data:
+  database-data:
