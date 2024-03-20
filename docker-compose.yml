@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./pokemon-trainer-api
+      dockerfile: DockerFile
+    ports:
+      - "3333:3333"
+    depends_on:
+      - database
+    environment:
+      - DB_HOST=database
+    volumes:
+      - ./pokemon-trainer-api:/app
+
+  frontend:
+    build:
+      context: ./pokemon-trainer-front
+      dockerfile: DockerFile
+    ports:
+      - "80:80"
+
+  database:
+    image: bitnami/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USERNAME=docker
+      - POSTGRESQL_PASSWORD=docker
+      - POSTGRESQL_DATABASE=apipokemontrainer
