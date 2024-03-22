@@ -17,6 +17,8 @@ type FormData = {
 };
 
 export function Login() {
+    const apiUrl = import.meta.env.VITE_REACT_APP_BACKEND_APP_API_URL;
+
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
@@ -27,7 +29,8 @@ export function Login() {
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         try {
-          const response = await axios.post("http://192.168.0.101:3333/sessions", {
+          const response = await axios.post(`${apiUrl}/sessions`, {
+            withCredentials: true,
             username: data.username,
             password: data.password
           });

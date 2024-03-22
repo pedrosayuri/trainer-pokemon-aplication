@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import axios from 'axios';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Container, Typography, TextField, Button, Grid } from '@mui/material';
-import { useState } from 'react';
 
 const schema = z.object({
   username: z.string().min(3).max(20),
@@ -16,6 +17,10 @@ type FormData = {
 };
 
 export function Register() {
+    const apiUrl = import.meta.env.VITE_REACT_APP_BACKEND_APP_API_URL;
+
+    const navigate = useNavigate();
+
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(schema),
     });
@@ -24,23 +29,27 @@ export function Register() {
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
         try {
-          const response = await axios.post("http://192.168.0.101:3333/trainers", {
+          const response = await axios.post(`${apiUrl}/trainers`, {
             username: data.username,
             password: data.password
           });
             response.data;
-            window.location.href = '/';
+            navigate('/');
           setError(null);
         } catch (error) {
             setError('Erro ao criar usuário. Por favor, tente novamente.');
         }
       };
 
+  const handleCancel = () => {
+    navigate('/');
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
         <Container component="main" maxWidth="xs" style={{ backgroundColor: '#cfcfcf', padding: '40px', borderRadius: '10px', boxShadow: '0px 0px 10px rgba(241, 0, 0, 0.1)' }}>
             <Typography component="h1" variant="h4" align="center" style={{ marginBottom: '20px', color: '#1a1919', fontWeight: 'bold' }}>
-            Login
+            Cadastrar
             </Typography>
             {error && <Typography variant="body2" color="error" align="center" style={{ marginBottom: '10px' }}>{error}</Typography>}
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -73,15 +82,27 @@ export function Register() {
                     helperText={errors.password?.message}
                 />
                 </Grid>
+                <Grid item xs={12}>
+                <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ bgcolor: '#1976d2', '&:hover': { bgcolor: '#115293' } }}
+                >
+                    Criar Usuário
+                </Button>
+                </Grid>
+                <Grid item xs={12}>
+                <Button
+                    fullWidth
+                    variant="contained"
+                    sx={{ bgcolor: '#e03d02', '&:hover': { bgcolor: '#931111' } }}
+                    onClick={handleCancel}
+                >
+                    Cancelar
+                </Button>
+                </Grid>
             </Grid>
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ marginTop: '20px', bgcolor: '#1976d2', '&:hover': { bgcolor: '#115293' } }}
-            >
-                Criar Usuário
-            </Button>
             </form>
         </Container>
     </div>

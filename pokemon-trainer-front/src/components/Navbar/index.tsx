@@ -8,10 +8,11 @@ import Typography from '@mui/material/Typography';
 import InputBase from '@mui/material/InputBase';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
+// import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MoreIcon from '@mui/icons-material/MoreVert';
+import { useNavigate } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -60,14 +61,16 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) => {
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/';
+    navigate('/');
   }
 
   const handlerChangePage = () => {
-    if (page === 'Home') window.location.href = '/home';
-    if (page === 'Team') window.location.href = '/team';
+    if (page === 'Home') navigate('/home');
+    if (page === 'Team') navigate('/team');
   }
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -134,16 +137,8 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) =
       onClose={handleMobileMenuClose}
     >
       <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
+        <MenuItem onClick={handlerChangePage}>{page}</MenuItem>
+        <MenuItem onClick={handleLogout}>Sair</MenuItem>
       </MenuItem>
     </Menu>
   );
@@ -152,7 +147,7 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) =
     <Box sx={{ flexGrow: 1, marginBottom: '2rem' }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
+          {/* <IconButton
             size="large"
             edge="start"
             color="inherit"
@@ -160,7 +155,7 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) =
             sx={{ mr: 2 }}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton> */}
           <Typography
             variant="h6"
             noWrap

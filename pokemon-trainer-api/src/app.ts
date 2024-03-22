@@ -11,7 +11,9 @@ import { pokemonTeamRoutes } from "./http/controllers/pokemon/routes";
 export const app = fastify();
 
 app.register(fastifyCors, {
-  origin: true,
+  origin: '*',
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 
 app.register(fastifyJwt, {

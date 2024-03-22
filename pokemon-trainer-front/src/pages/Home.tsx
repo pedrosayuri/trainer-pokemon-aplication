@@ -1,42 +1,49 @@
-import { Container, Grid, Typography } from "@mui/material";
-import Navbar from "../components/Navbar";
-import PokemonCard from "../components/PokemonCard";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import Navbar from "../components/Navbar";
+import { useContext, useEffect, useState } from "react";
 import { Pokemon } from "../interfaces/Pokemon";
+import PokemonCard from "../components/PokemonCard";
+import { Container, Grid, Typography, CircularProgress } from "@mui/material";
+import { TeamContext } from "../context/TeamContext";
 
 export function Home() {
+  const apiUrl = import.meta.env.VITE_REACT_APP_BACKEND_APP_API_URL;
+
+  const { teamNameExists } = useContext(TeamContext);
+
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [searchPokemon, setSearchPokemon] = useState("");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const getPokemons = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get("http://192.168.0.101:3333/pokemon/listAll", {
+      const response = await axios.get(`${apiUrl}/pokemon/listAll`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       setPokemons(response.data);
+      setLoading(false);
     } catch (error) {
       setError("Não foi encontrado nenhum Pokémon na pokédex com o nome inserido.");
     }
   };
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.value === "") {
-      getPokemons();  
+  const handleSearchChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = event.target.value;
+    if (searchTerm === "") {
+      getPokemons();
     } else {
-      setSearchPokemon(event.target.value);
-    }   
+      await pokemonFilter(searchTerm);
+    }
   };
 
   const pokemonFilter = async (searchPokemon: string) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post("http://192.168.0.101:3333/pokemon/listByNameAndTypes", {
+      const response = await axios.post(`${apiUrl}/pokemon/listByNameAndTypes`, {
         name: searchPokemon
       }, {
         headers: {
@@ -45,36 +52,38 @@ export function Home() {
       });
 
       setPokemons(response.data);
+      setLoading(false);
       setError(null);
     } catch (error) {
       console.error("Erro ao buscar pokemons:", error);
       setError("Não foi encontrado nenhum Pokémon na pokédex com o nome inserido.");
       setPokemons([]);
     }
-  }
+  };
 
   useEffect(() => {
     getPokemons();
   }, []);
 
-  useEffect(() => {
-    pokemonFilter(searchPokemon);
-  }, [searchPokemon]);
-
   return (
     <div>
       <Navbar handleSearchChange={handleSearchChange} page="Team" isSearch/>
       <Container maxWidth="xl">
-        {error && pokemons.length === 0 ? (
+        {loading ? (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+            <CircularProgress />
+          </div>
+        ) : error && pokemons.length === 0 ? (
           <Typography variant="h6" color="error" align="center" style={{ marginTop: "2rem" }}>
             {error}
           </Typography>
         ) : (
           <Grid container spacing={3}>
             {pokemons.map((pokemon) => (
-              <Grid item xs={3} key={pokemon.id}>
+              <Grid item xs={12} sm={6} md={4} lg={3} key={pokemon.id}>
                 <PokemonCard
                   pokemon={pokemon}
+                  teamNameExists={teamNameExists}
                 />
               </Grid>
             ))}

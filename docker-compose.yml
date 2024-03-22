@@ -1,27 +1,23 @@
-version: '3'
-
 services:
   backend:
+    container_name: backend
     build:
       context: ./pokemon-trainer-api
       dockerfile: DockerFile
     ports:
       - "3333:3333"
-    depends_on:
-      - database
     environment:
-      - DB_HOST=database
+      - NODE_ENV=dev
+      - JWT_SECRET=pokemontrainer
+      - DATABASE_URL=postgresql://docker:docker@database:5432/apipokemontrainer?schema=public
     volumes:
       - backend-data:/app
-
-  frontend:
-    build:
-      context: ./pokemon-trainer-front
-      dockerfile: DockerFile
-    ports:
-      - "80:80"
+      - ./pokemon-trainer-api/src:/app/src
+    networks:
+      - app-network
 
   database:
+    container_name: database
     image: bitnami/postgresql
     ports:
       - "5432:5432"
@@ -31,6 +27,12 @@ services:
       - POSTGRESQL_DATABASE=apipokemontrainer
     volumes:
       - database-data:/bitnami/postgresql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   backend-data:
