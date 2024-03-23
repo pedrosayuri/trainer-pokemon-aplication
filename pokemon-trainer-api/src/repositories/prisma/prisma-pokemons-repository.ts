@@ -19,4 +19,13 @@ export class PrismaPokemonsRepository implements PokemonsRepository {
     });
     return pokemon;
   }
+
+  async getTeamPokemons(trainerId: string): Promise<Pokemon[]> {
+    const pokemons = await prisma.pokemon.findMany({
+      where: {
+        trainer_id: trainerId,
+      },
+    });
+    return pokemons;
+  }
 }

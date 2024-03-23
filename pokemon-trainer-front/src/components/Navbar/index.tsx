@@ -1,18 +1,11 @@
-import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import InputBase from '@mui/material/InputBase';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-// import MenuIcon from '@mui/icons-material/Menu';
+import React, { useState } from 'react';
+import { IconButton, Menu, MenuItem, Box, AppBar, Toolbar, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircle from '@mui/icons-material/AccountCircle';
-import MoreIcon from '@mui/icons-material/MoreVert';
+import SendIcon from '@mui/icons-material/Send';
 import { useNavigate } from 'react-router-dom';
+import { alpha, styled } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -28,6 +21,9 @@ const Search = styled('div')(({ theme }) => ({
     marginLeft: theme.spacing(3),
     width: 'auto',
   },
+  [theme.breakpoints.down('sm')]: {
+    width: '100%',
+  },
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -39,6 +35,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   alignItems: 'center',
   justifyContent: 'center',
 }));
+
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
@@ -56,45 +53,44 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 interface NavbarProps {
   page: string;
   isSearch?: boolean;
-  handleSearchChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSearch?: (searchTerm: string) => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) => {
-
+const Navbar: React.FC<NavbarProps> = ({ handleSearch, page, isSearch }) => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState(""); 
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const term = event.target.value;
+    setSearchTerm(term);
+  };
+
+  const handleSearchButtonClick = () => {
+    if (handleSearch) {
+      handleSearch(searchTerm);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
-  }
+  };
 
   const handlerChangePage = () => {
     if (page === 'Home') navigate('/home');
     if (page === 'Team') navigate('/team');
-  }
+  };
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
 
   const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
   const handleMenuClose = () => {
     setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
   };
 
   const menuId = 'primary-search-account-menu';
@@ -119,43 +115,10 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) =
     </Menu>
   );
 
-  const mobileMenuId = 'primary-search-account-menu-mobile';
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: 'top',
-        horizontal: 'right',
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <MenuItem onClick={handlerChangePage}>{page}</MenuItem>
-        <MenuItem onClick={handleLogout}>Sair</MenuItem>
-      </MenuItem>
-    </Menu>
-  );
-
   return (
     <Box sx={{ flexGrow: 1, marginBottom: '2rem' }}>
       <AppBar position="static">
         <Toolbar>
-          {/* <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton> */}
           <Typography
             variant="h6"
             noWrap
@@ -165,48 +128,42 @@ const Navbar: React.FC<NavbarProps> = ({ handleSearchChange, page, isSearch }) =
             Pokédex
           </Typography>
           {isSearch && (
-            <Search onChange={handleSearchChange}>
+            <Search>
               <SearchIconWrapper>
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
-                onChange={handleSearchChange}
+                onChange={handleChange}
               />
             </Search>
           )}
+          {isSearch && (
+            <IconButton
+              aria-label="search"
+              onClick={handleSearchButtonClick}
+              color="inherit"
+            >
+              <SendIcon />
+            </IconButton>
+          )}
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls={menuId}
+            aria-haspopup="true"
+            onClick={handleProfileMenuOpen}
+            color="inherit"
+          >
+            <AccountCircle />
+          </IconButton>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
       {renderMenu}
     </Box>
   );
-}
+};
 
 export default Navbar;

@@ -22,6 +22,8 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
   const [evolutions, setEvolutions] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [hovered, setHovered] = useState<boolean>(false);
+  const [openEvolutions, setOpenEvolutions] = useState<boolean>(true);
 
   const handleAddPokemonToTeam = async () => {
     try {
@@ -37,7 +39,7 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
       setErrorMessage(null);
       setSuccessMessage('Pokémon adicionado ao time com sucesso!');
       setOpenSnackbar(true);
-    } catch (error: any) {
+    } catch (error) {
       console.error("Erro ao adicionar pokemon ao time:", error);
       if (axios.isAxiosError(error)) {
         const axiosError = error as AxiosError;
@@ -67,6 +69,7 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
       setSuccessMessage(null);
       setOpenSnackbar(false);
       setEvolutions(response.data[0].evolutions);
+      setOpenEvolutions(false);
 
     } catch (error) {
       console.error("Erro ao buscar evoluções do pokemon:", error);
@@ -77,12 +80,26 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
     }
   }
 
+  const handleStopSeeEvolutions = () => {
+    setEvolutions([]);
+    setOpenEvolutions(true);
+  }
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   }
 
   return (
-    <Card sx={{ maxWidth: 300 }}>
+    <Card 
+      sx={{ 
+        maxWidth: 300,
+        transition: 'transform 0.1s ease-in-out',
+        transform: hovered ? 'scale(1) translateY(-15px)' : 'scale(1)',
+        backgroundColor: hovered ? '#00a3a3': 'white',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       <CardMedia
         sx={{ height: 300 }}
         image={pokemon.image}
@@ -131,11 +148,13 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
             </Button>
           </div>
         )}
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <Button variant="outlined" color="primary" onClick={handleViewMore}>
+        {openEvolutions && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+          <Button variant="contained" color="primary" onClick={handleViewMore}>
             Ver evoluções
           </Button>
         </div>
+        )}
         {loading && (
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
             <CircularProgress />
@@ -147,6 +166,11 @@ export default function PokemonCard({ pokemon, teamNameExists }: PokemonCardProp
               {evolutions.map((evolution, index) => (
                 <div key={index}>{index+1} º Evolução - {evolution}</div>
               ))}
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+                  <Button variant="contained" color="error" onClick={handleStopSeeEvolutions}>
+                    Ver Menos
+                  </Button>
+                </div>
             </Typography>
           </div>
         )}
