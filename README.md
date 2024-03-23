@@ -1,6 +1,12 @@
-## App 
+## App - Aplicação de Trainador pokemon
 
-Treinador Pokemon API
+- 1º Para iniciar a aplicação baixe ou clone os arquivos em sua máquina.
+- 2º Entre na pasta "Trainer-pokemon-aplication" e execute o comando "docker compose up -d --build" para executar a aplicação BackEnd e o Banco de Dados e espere terminar de executar.
+- 3ª Entre na pasta "pokemon-trainer-front" e execute o mesmo comando "docker compose up -d --build" para executar a aplicação FrontEnd e espere terminar de executar.
+- 4º Após a execução dos comandos entre em um navegador e digite "http://localhost:5173".
+
+## Link do vídeo da execução do projeto
+
 
 ## Desafios
 
