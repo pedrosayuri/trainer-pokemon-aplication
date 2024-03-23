@@ -5,6 +5,9 @@
 - 3ª Entre na pasta "pokemon-trainer-front" e execute o mesmo comando "docker compose up -d --build" para executar a aplicação FrontEnd e espere terminar de executar.
 - 4º Após a execução dos comandos entre em um navegador e digite "http://localhost:5173".
 
+## Link do vídeo da execução do projeto
+- https://youtu.be/L6DH6tWp_Iw
+
 ## Desafios
 
 - [x] Criar um sistema onde treinadores possam entrar se cadastrando com o seu nome de treinador e senha.
